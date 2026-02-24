@@ -2231,17 +2231,13 @@
         // ── EXPORT ──
         function exportHistory() {
             if (historyData.length === 0) { showToast('⚠️ No data to export'); return; }
-            const csv = ['Zone,Time,Need Level,Bullets,Fertilizer,Area(m²),N,P,K,AirTemp,SoilTemp,Moisture,Humidity,CO2,NH3,VOC,pH,EC']
-                .concat(historyData.map(h =>
-                    `"${h.zone}","${h.time}","${h.level}",${h.bullets},"${h.fertType}",${h.area},${h.sensors.n},${h.sensors.p},${h.sensors.k},${h.sensors.airTemp},${h.sensors.soilTemp},${h.sensors.moist},${h.sensors.humidity},${h.sensors.co2},${h.sensors.nh3},${h.sensors.voc},${h.sensors.ph},${h.sensors.ec}`
-                ))
-                .join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
+            const jsonStr = JSON.stringify(historyData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'green_swarm_fertilization_log.csv';
+            a.download = 'green_swarm_fertilization_log.json';
             a.click();
-            showToast('📥 History exported as CSV!');
+            showToast('📥 History exported as JSON!');
         }
 
         // ── TABS ──
