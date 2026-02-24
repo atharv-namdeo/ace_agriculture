@@ -2177,7 +2177,14 @@
                 zone: `${z.lat.toFixed(4)}, ${z.lng.toFixed(4)}`,
                 time: now.toLocaleString(),
                 level: levelLabel[z.level],
-                bullets, fertType, area
+                bullets, fertType, area,
+                sensors: {
+                    n: z.n, p: z.p, k: z.k,
+                    airTemp: z.airTemp, soilTemp: z.soilTemp,
+                    moist: z.moisture, humidity: z.humidity,
+                    co2: z.co2, nh3: z.nh3, voc: z.voc,
+                    ph: z.ph, ec: z.ec
+                }
             });
             totalBullets += bullets;
             totalArea += area;
@@ -2206,6 +2213,13 @@
         <div>Bullets: <span>${h.bullets}</span></div>
         <div>Type: <span>${h.fertType}</span></div>
         <div>Area: <span>${h.area}m²</span></div>
+      </div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px dashed #1a3d26;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px;font-family:'JetBrains Mono',monospace">
+        <div style="color:var(--text-muted)">🌱 NPK: <span style="color:#ff8a65">${h.sensors.n}</span> <span style="color:#81d4fa">${h.sensors.p}</span> <span style="color:#ce93d8">${h.sensors.k}</span></div>
+        <div style="color:var(--text-muted)">🌡️ Temp: <span style="color:#ff8a65">${h.sensors.airTemp}°C</span> <span style="color:#ff7043">${h.sensors.soilTemp}°C</span></div>
+        <div style="color:var(--text-muted)">💧 Moist: <span style="color:#4fc3f7">${h.sensors.moist}%</span> RH: <span style="color:#29b6f6">${h.sensors.humidity}%</span></div>
+        <div style="color:var(--text-muted)">⚗️ pH: <span style="color:var(--amber)">${h.sensors.ph}</span> EC: <span style="color:#ffa726">${h.sensors.ec}</span></div>
+        <div style="color:var(--text-muted);grid-column:span 2">☁️ Gas: CO₂ <span style="color:#ffeb3b">${h.sensors.co2}</span> | NH3 <span style="color:#ffd600">${h.sensors.nh3}</span> | VOC <span style="color:#ffcc02">${h.sensors.voc}</span></div>
       </div>`;
                 list.appendChild(div);
             });
@@ -2217,8 +2231,10 @@
         // ── EXPORT ──
         function exportHistory() {
             if (historyData.length === 0) { showToast('⚠️ No data to export'); return; }
-            const csv = ['Zone,Time,Need Level,Bullets,Fertilizer,Area(m²)']
-                .concat(historyData.map(h => `"${h.zone}","${h.time}","${h.level}",${h.bullets},"${h.fertType}",${h.area}`))
+            const csv = ['Zone,Time,Need Level,Bullets,Fertilizer,Area(m²),N,P,K,AirTemp,SoilTemp,Moisture,Humidity,CO2,NH3,VOC,pH,EC']
+                .concat(historyData.map(h =>
+                    `"${h.zone}","${h.time}","${h.level}",${h.bullets},"${h.fertType}",${h.area},${h.sensors.n},${h.sensors.p},${h.sensors.k},${h.sensors.airTemp},${h.sensors.soilTemp},${h.sensors.moist},${h.sensors.humidity},${h.sensors.co2},${h.sensors.nh3},${h.sensors.voc},${h.sensors.ph},${h.sensors.ec}`
+                ))
                 .join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
             const a = document.createElement('a');
